@@ -1,0 +1,2254 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<product productid="invoices" active="1">
+	<title>Invoices</title>
+	<description>User Invoices</description>
+	<version>1.0.0</version>
+	<url>http://www.christeris.com/index.php</url>
+	<versioncheckurl />
+	<dependencies>
+		<dependency dependencytype="vbulletin" minversion="4.2.0 Beta 1" maxversion="" />
+	</dependencies>
+	<codes>
+		<code version="1.0.0">
+			<installcode><![CDATA[
+        $vbulletin->db->query_write("
+        CREATE TABLE IF NOT EXISTS `". TABLE_PREFIX ."invoices_invoices` (
+          `id` int(10) unsigned NOT NULL auto_increment,
+          `userid` int(10) unsigned NOT NULL default '0',
+          `customerid` int(10) unsigned NOT NULL default '0',
+          `invoiceid` int(10) unsigned NOT NULL default '0',
+          `issued` date NOT NULL default '0000-00-00',
+          `duedate` date NOT NULL default '0000-00-00',
+          `paid` date NOT NULL default '0000-00-00',
+          `itemname1` varchar(255) default NULL,
+          `itemquantity1` int(3) NOT NULL default '0',
+          `itemprice1` decimal(10,2) NOT NULL default '0.00',
+          `itemnet1` decimal(10,2) NOT NULL default '0.00',
+          `itemtax1` decimal(10,2) NOT NULL default '0.00',
+          `itemtaxamount1` decimal(10,2) NOT NULL default '0.00',
+          `itemtotal1` decimal(10,2) NOT NULL default '0.00',
+          `itemname2` varchar(255) default NULL,
+          `itemquantity2` int(3) NOT NULL default '0',
+          `itemprice2` decimal(10,2) NOT NULL default '0.00',
+          `itemnet2` decimal(10,2) NOT NULL default '0.00',
+          `itemtax2` decimal(10,2) NOT NULL default '0.00',
+          `itemtaxamount2` decimal(10,2) NOT NULL default '0.00',
+          `itemtotal2` decimal(10,2) NOT NULL default '0.00',
+          `itemname3` varchar(255) default NULL,
+          `itemquantity3` int(3) NOT NULL default '0',
+          `itemprice3` decimal(10,2) NOT NULL default '0.00',
+          `itemnet3` decimal(10,2) NOT NULL default '0.00',
+          `itemtax3` decimal(10,2) NOT NULL default '0.00',
+          `itemtaxamount3` decimal(10,2) NOT NULL default '0.00',
+          `itemtotal3` decimal(10,2) NOT NULL default '0.00',
+          `itemname4` varchar(255) default NULL,
+          `itemquantity4` int(3) NOT NULL default '0',
+          `itemprice4` decimal(10,2) NOT NULL default '0.00',
+          `itemnet4` decimal(10,2) NOT NULL default '0.00',
+          `itemtax4` decimal(10,2) NOT NULL default '0.00',
+          `itemtaxamount4` decimal(10,2) NOT NULL default '0.00',
+          `itemtotal4` decimal(10,2) NOT NULL default '0.00',
+          `itemname5` varchar(255) default NULL,
+          `itemquantity5` int(3) NOT NULL default '0',
+          `itemprice5` decimal(10,2) NOT NULL default '0.00',
+          `itemnet5` decimal(10,2) NOT NULL default '0.00',
+          `itemtax5` decimal(10,2) NOT NULL default '0.00',
+          `itemtaxamount5` decimal(10,2) NOT NULL default '0.00',
+          `itemtotal5` decimal(10,2) NOT NULL default '0.00',
+          `subtotal` decimal(10,2) NOT NULL default '0.00',
+          `discount` decimal(10,2) NOT NULL default '0.00',
+          `total` decimal(10,2) NOT NULL default '0.00',
+          `taxamount` decimal(10,2) NOT NULL default '0.00',
+          `shipping` decimal(10,2) NOT NULL default '0.00',
+          `invoicetotal` decimal(10,2) NOT NULL default '0.00',
+          `terms` mediumtext,
+          `transid` varchar(35) NOT NULL default '',
+          `isvoid` tinyint(1) NOT NULL default '0',
+          `sent` tinyint(1) NOT NULL default '0',
+          PRIMARY KEY  (`id`),
+          KEY `userid` (`userid`),
+          KEY `customerid` (`customerid`),
+          KEY `invoiceid` (`invoiceid`),
+          KEY `duedate` (`duedate`),
+          KEY `transid` (`transid`)
+        ) ENGINE=MyISAM
+        ");
+        $vbulletin->db->query_write("
+        CREATE TABLE IF NOT EXISTS `". TABLE_PREFIX ."invoices_customers` (
+          `id` int(11) NOT NULL auto_increment,
+          `userid` int(10) unsigned NOT NULL default '0',
+          `name` varchar(150) default NULL,
+          `address` varchar(150) default NULL,
+          `city` varchar(50) default NULL,
+          `state` varchar(50) default NULL,
+          `country` varchar(50) default NULL,
+          `zipcode` varchar(50) default NULL,
+          `phone` varchar(50) default NULL,
+          `vatdetails` varchar(50) default NULL,
+          `email` varchar(100) default NULL,
+          `terms` varchar(255) default NULL,
+          `invoices` int(3) NOT NULL default '0',
+          `amount` decimal(10,2) NOT NULL default '0.00',
+          `paid` decimal(10,2) NOT NULL default '0.00',
+          `unpaid` decimal(10,2) NOT NULL default '0.00',
+          `overdue` decimal(10,2) NOT NULL default '0.00',
+          `regkey` varchar(100) NOT NULL default '',
+          PRIMARY KEY  (`id`),
+          KEY `userid` (`userid`),
+          KEY `name` (`name`),
+          KEY `regkey` (`regkey`)
+        ) ENGINE=MyISAM
+        ");
+        $vbulletin->db->query_write("
+        CREATE TABLE IF NOT EXISTS `".TABLE_PREFIX."invoices_payments` (
+          `id` varchar(35) NOT NULL default '',
+          `script` varchar(100) NOT NULL default '',
+          `function` varchar(50) NOT NULL default '',
+          PRIMARY KEY  (`id`)
+        ) ENGINE=MyISAM
+        ");
+        $vbulletin->db->query_write("
+        CREATE TABLE IF NOT EXISTS `". TABLE_PREFIX ."invoices_settings` (
+          `id` int(10) unsigned NOT NULL auto_increment,
+          `userid` int(10) unsigned NOT NULL default '0',
+          `emailtitle1` varchar(250) NOT NULL default '',
+          `emailbody1` mediumtext,
+          `emailtitle2` varchar(250) NOT NULL default '',
+          `emailbody2` mediumtext,
+          `emailtitle3` varchar(250) NOT NULL default '',
+          `emailbody3` mediumtext,
+          `emailtitle4` varchar(250) NOT NULL default '',
+          `emailbody4` mediumtext,
+          `emailfooter` mediumtext,
+          `invoice` varchar(100) NOT NULL default '',
+          `invoicenbr` varchar(100) NOT NULL default '',
+          `invoiceto` varchar(100) NOT NULL default '',
+          `issued` varchar(100) NOT NULL default '',
+          `duedate` varchar(100) NOT NULL default '',
+          `unpaid` varchar(100) NOT NULL default '',
+          `paid` varchar(100) NOT NULL default '',
+          `overdue` varchar(100) NOT NULL default '',
+          `item` varchar(100) NOT NULL default '',
+          `quantity` varchar(100) NOT NULL default '',
+          `price` varchar(100) NOT NULL default '',
+          `net` varchar(100) NOT NULL default '',
+          `tax` varchar(100) NOT NULL default '',
+          `taxsum` varchar(100) NOT NULL default '',
+          `gross` varchar(100) NOT NULL default '',
+          `subtotal` varchar(100) NOT NULL default '',
+          `discount` varchar(100) NOT NULL default '',
+          `totalnet` varchar(100) NOT NULL default '',
+          `taxamount` varchar(100) NOT NULL default '',
+          `shipping` varchar(100) NOT NULL default '',
+          `balancedue` varchar(100) NOT NULL default '',
+          `terms` varchar(100) NOT NULL default '',
+          `phone` varchar(100) NOT NULL default '',
+          `email` varchar(100) NOT NULL default '',
+          `vatdetails` varchar(100) NOT NULL default '',
+          PRIMARY KEY  (`id`),
+          KEY `userid` (`userid`)
+        ) ENGINE=MyISAM
+        ");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."usergroup ADD invoices INT( 10 ) UNSIGNED DEFAULT '0' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_company MEDIUMTEXT DEFAULT '' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_logo VARCHAR( 255 ) DEFAULT '' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_paypal TINYINT( 1 ) UNSIGNED DEFAULT '0' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_paypal_email VARCHAR( 255 ) DEFAULT '' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_priceformat TINYINT( 1 ) UNSIGNED DEFAULT '1' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_dateformat VARCHAR( 20 ) DEFAULT 'm/d/Y' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_charset VARCHAR( 20 ) DEFAULT 'utf-8' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_chardir VARCHAR( 20 ) DEFAULT 'ltr' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_vat DECIMAL( 5,2 ) DEFAULT '0.00' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_nextinvoice INT( 10 ) UNSIGNED DEFAULT '1' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_currency VARCHAR( 10 ) DEFAULT '$' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_currency_long VARCHAR( 10 ) DEFAULT 'USD' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_perpage INT( 5 ) UNSIGNED DEFAULT '15' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_fromname VARCHAR( 100 ) DEFAULT '' NOT NULL");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user ADD inv_fromemail VARCHAR( 100 ) DEFAULT '' NOT NULL");
+		]]></installcode>
+			<uninstallcode><![CDATA[
+        $vbulletin->db->query_write("
+          DROP TABLE
+`". TABLE_PREFIX ."invoices_invoices`, `". TABLE_PREFIX ."invoices_settings`,
+`". TABLE_PREFIX ."invoices_customers`, `". TABLE_PREFIX ."invoices_payments`
+        ");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."usergroup DROP invoices");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_company");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_logo");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_paypal");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_paypal_email");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_priceformat");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_dateformat");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_currency");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_currency_long");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_charset");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_chardir");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_vat");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_nextinvoice");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_perpage");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_fromname");
+        $vbulletin->db->query_write("ALTER TABLE ". TABLE_PREFIX ."user DROP inv_fromemail");
+      ]]></uninstallcode>
+		</code>
+	</codes>
+	<templates>
+		<template name="invoices.css" templatetype="template" date="1161281455" username="" version="1.0.0"><![CDATA[
+@charset "UTF-8";
+#pagetitle {
+	margin-bottom: 10px;
+}
+.subcats h4 {
+	padding-{vb:stylevar right}: {vb:math {vb:stylevar padding}/2};
+}
+.subcats h4, .subcats .commalist {
+	float:{vb:stylevar left};
+	clear:{vb:stylevar right};
+}
+#above_files {
+	margin-bottom:{vb:stylevar padding};
+}
+#below_files {
+	margin-top:{vb:stylevar padding};
+}
+#below_files_2x {
+	margin-top:{vb:math 2 * {vb:stylevar padding}};
+}
+.pagenavright {
+	float: {vb:stylevar right};
+}
+td.menu {
+    padding-left:5px;
+    padding-top:5px;
+    padding-right:0px;
+    padding-bottom:0px;
+}
+.mc_fieldset {
+	border: {vb:stylevar pagination_border};
+	margin: 0;
+	padding: {vb:math {vb:stylevar threadlisthead_font.fontSize}/3}px;
+}
+.mc_legend {
+	color: {vb:stylevar body_color};
+}
+
+.mc_ul {
+	list-style-type: circle;
+    margin-left: 15px;
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+.mc_li {
+	list-style-type: circle;
+	font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.nobullets {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.fly {
+	float: {vb:stylevar right};
+	display: inline;
+	font-size: 88%;
+}
+/* RATINGS */
+.popupbody .rating {
+	display:block;
+	padding:{vb:stylevar popup_padding}px;
+	padding-{vb:stylevar left}:{vb:math 2 * {vb:stylevar popup_padding} + 75}px;
+	background:transparent url({vb:stylevar imgdir_rating}/rating-15_0.png) {vb:stylevar popup_padding}px center no-repeat;
+}
+.popupbody .rating.r5 { background-image:url({vb:stylevar imgdir_rating}/rating-15_5.png); }
+.popupbody .rating.r4 { background-image:url({vb:stylevar imgdir_rating}/rating-15_4.png); }
+.popupbody .rating.r3 { background-image:url({vb:stylevar imgdir_rating}/rating-15_3.png); }
+.popupbody .rating.r2 { background-image:url({vb:stylevar imgdir_rating}/rating-15_2.png); }
+.popupbody .rating.r1 { background-image:url({vb:stylevar imgdir_rating}/rating-15_1.png); }
+.commenthead img {
+	position: relative;
+	top: -3px;
+}
+/****************************/
+/* Don't use left and right stylevar here */
+#content_container {
+	width:100%;
+	float:left;
+	margin-right: -{vb:math {vb:stylevar forum_sidebar_width}+{vb:math {vb:stylevar padding}*2}};
+	padding: 10px 0;
+}
+#content_container.contentright {
+	float:right;
+	margin-right:0;
+	margin-left:-{vb:math {vb:stylevar forum_sidebar_width}+{vb:stylevar padding}};
+}
+#content_container #content {
+	margin-right:{vb:math {vb:stylevar forum_sidebar_width}+{vb:math {vb:stylevar padding}*2}};
+}
+#content_container.contentright #content {
+	margin-right:0;
+	margin-left:{vb:math {vb:stylevar forum_sidebar_width}+{vb:stylevar padding}};
+}
+/*-----------------------------------*/
+/* SIDEBAR */
+/* Don't use left and right stylevar here */
+#sidebar_container {
+	float:right;
+	width:{vb:stylevar forum_sidebar_width};
+	padding:0 0;
+	margin-bottom:3em;
+
+}
+#sidebar_container.sidebarleft {
+	float:left;
+}
+#sidebar_button {
+	display:block;
+	margin-top: 40px;
+	float:right;
+	margin-right:-28px;
+	_margin: 40px 0 0 0;
+	_display: inline-block;
+}
+#sidebar_button {
+	_display: inline;
+}
+#sidebar_container.sidebarleft #sidebar_button {
+	float:left;
+	margin-left:-28px;
+}
+#sidebar_container .block {
+	margin-bottom:4px;
+	padding:6px;
+	background:{vb:stylevar forum_sidebar_background};
+	-moz-border-radius-top{vb:stylevar left}:{vb:stylevar border_radius};
+	-moz-border-radius-top{vb:stylevar right}:{vb:stylevar border_radius};
+	-webkit-border-top-left-radius: {vb:stylevar border_radius};
+	-webkit-border-top-right-radius: {vb:stylevar border_radius};
+}
+#sidebar_container .blockbody {
+	color: {vb:stylevar forum_sidebar_content_color};
+	background:{vb:stylevar forum_sidebar_content_background.backgroundColor};
+	-moz-border-radius:{vb:stylevar border_radius};
+	-webkit-border-radius: {vb:stylevar border_radius};
+	padding:0;
+	border:{vb:stylevar forum_sidebar_content_border};
+}
+#sidebar_container .blockrow {
+	border-top:1px solid {vb:stylevar forum_sidebar_content_background.backgroundColor}; /* makes the bevel look part of the background */
+	-moz-border-radius:{vb:stylevar border_radius};
+	-webkit-border-radius: {vb:stylevar border_radius};
+	background:{vb:stylevar forum_sidebar_content_background};
+	_background-image: none;
+}
+#sidebar_container .underblock {
+	height:{vb:stylevar forum_sidebar_content_separator_height};
+	background:{vb:stylevar forum_sidebar_content_separator_background};
+}
+#sidebar_container .blockrow,
+#sidebar_container .blocksubhead {
+	padding:10px 6px 10px 6px;
+	color: {vb:stylevar forum_sidebar_header_color};
+}
+#sidebar_container .blocksubhead {
+	background:transparent none;
+	height:{vb:math {vb:stylevar mid_fontSize}*{vb:stylevar line_height} + 2px };
+	padding: 5px 6px;
+	border:none;
+	outline:none;
+	font-weight:bold;
+}
+#sidebar_container .blocksubhead span.blocktitle {
+	width:{vb:math {vb:stylevar forum_sidebar_width} - 70px};
+	display:block;
+	white-space:nowrap;
+	float:left;
+	overflow:hidden;
+	padding-left:3px;
+}
+#sidebar_container .blocksubhead img {
+	vertical-align:middle;
+	float: {vb:stylevar left};
+}
+#sidebar_container .blocksubhead img.inlineimg {
+	float: none;
+	position: relative;
+	top: -2px;
+}
+/* Add a "middle" font size, between default and small */
+#sidebar_container .blocksubhead.smaller {
+	font:{vb:stylevar forum_sidebar_header_font};
+}
+#sidebar_container .blockrow {
+	font-size:{vb:stylevar mid_fontSize};
+}
+#sidebar_container .blockrow .meta {
+	font-size:{vb:stylevar small_fontSize};
+}
+#sidebar_container .blocksubhead a.username {
+	padding-{vb:stylevar right}:20px;
+}
+#sidebar_container .formcontrols .blockrow label {
+	width:auto;
+}
+#sidebar_container .advanced.blockfoot {
+	padding:6px;
+	border-bottom:none;
+	font-size:88%;
+	font-weight:bold;
+	background: transparent;
+}
+#sidebar_container .searchblock .advanced a {
+	line-height:2;
+}
+#sidebar_container .searchblock .advanced .button {
+	float:{vb:stylevar right};
+}
+#sidebar_container > ul {
+	background-color:{vb:stylevar forum_sidebar_background.backgroundColor};
+	border:{vb:stylevar forum_sidebar_border};
+	-moz-border-radius:{vb:stylevar border_radius};
+	-webkit-border-radius: {vb:stylevar border_radius};
+	-moz-box-shadow:-2px 2px 2px {vb:stylevar shadow_color};
+	float:{vb:stylevar left};
+	width:100%;
+}
+#sidebar_container a.collapse {
+	position:static;
+}
+#sidebar_container a.title {
+	font-weight:bold;
+}]]></template>
+		<template name="invoices_addedit_customer" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+
+{vb:stylevar htmldoctype}
+<html xmlns="http://www.w3.org/1999/xhtml" dir="{vb:stylevar textdirection}" lang="{vb:stylevar languagecode}" id="vbulletin_html">
+<head>
+  <title>{vb:var vbphrase.invoices_addedit_customer}</title>
+  {vb:raw headinclude}
+  <link rel="stylesheet" type="text/css" href="{vb:var vbcsspath}invoices.css" />
+  <link rel="stylesheet" href="invoices/includes/thumbnailviewer.css" type="text/css" />
+  <script src="invoices/includes/thumbnailviewer.js" type="text/javascript"></script>
+</head>
+<body>
+{vb:raw header}
+{vb:raw navbar}
+<script type="text/javascript">
+function validateForm_vbform()
+{
+  if(document.forms["vbform"].name.value.length == 0) {
+    alert('Empty Company');
+    return false;
+  }
+  if(document.forms["vbform"].email.value.length == 0) {
+    alert('Empty Email address');
+    return false;
+  }
+  return true;
+}
+</script>
+<div class="blockbody">
+<br />
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+  <tr>
+    <td width="70%" align="left" valign="top">
+<form class="block vbform" action="invoices.php?do=updatecustomer" method="post" enctype="multipart/form-data" name="vbform">
+<input type="hidden" name="id" value="{vb:raw id}" />
+<input type="hidden" name="userid" value="{vb:raw userid}" />
+<table cellpadding="2" cellspacing="2" width="100%" border="0">
+  <tr>
+    <td colspan="2" class="blockhead" align="center" width="100%">
+      <b>{vb:var vbphrase.invoices_addedit_customer}</b>
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" width="30%" align="left">
+      {vb:var vbphrase.invoices_name}
+    </td>
+    <td class="blockrow" width="70%" align="left">
+      <input type="text" name="name" size="50" value="{vb:raw name}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" width="30%" align="left">
+      {vb:var vbphrase.invoices_address}
+    </td>
+    <td class="blockrow" width="70%" align="left">
+      <input type="text" name="address" size="50" value="{vb:raw address}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" width="30%" align="left">
+      {vb:var vbphrase.invoices_city}
+    </td>
+    <td class="blockrow" width="70%" align="left">
+      <input type="text" name="city" size="50" value="{vb:raw city}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" width="30%" align="left">
+      {vb:var vbphrase.invoices_zipcode}
+    </td>
+    <td class="blockrow" width="70%" align="left">
+      <input type="text" name="zipcode" size="50" value="{vb:raw zipcode}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" width="30%" align="left">
+      {vb:var vbphrase.invoices_state}
+    </td>
+    <td class="blockrow" width="70%" align="left">
+      <input type="text" name="state" size="50" value="{vb:raw state}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" width="30%" align="left">
+      {vb:var vbphrase.invoices_country}
+    </td>
+    <td class="blockrow" width="70%" align="left">
+      <input type="text" name="country" size="50" value="{vb:raw country}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" width="30%" align="left">
+      {vb:var vbphrase.invoices_phone}
+    </td>
+    <td class="blockrow" width="70%" align="left">
+      <input type="text" name="phone" size="50" value="{vb:raw phone}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" width="30%" align="left">
+      {vb:var vbphrase.invoices_email}
+    </td>
+    <td class="blockrow" width="70%" align="left">
+      <input type="text" name="email" size="50" value="{vb:raw email}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" width="30%" align="left">
+      {vb:var vbphrase.invoices_vatdetails}
+    </td>
+    <td class="blockrow" width="70%" align="left">
+      <input type="text" name="vatdetails" size="50" value="{vb:raw vatdetails}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" width="30%" align="left">
+      {vb:var vbphrase.invoices_terms}
+    </td>
+    <td class="blockrow" width="70%" align="left">
+      <input type="text" name="terms" size="50" value="{vb:raw terms}">
+    </td>
+  </tr>
+  <tr>
+    <td align="center" class="blocksubhead" colspan="2">
+      <input type="submit" class="button" name="sbutton" value="{vb:var vbphrase.invoices_submit}" onclick="return validateForm_vbform()">
+    </td>
+  </tr>
+</table>
+</form>
+    </td>
+    <td align="left" valign="top" width="30%" style="padding-left:10px;">
+      <div id="sidebar_container">
+        <ul id="sidebar">
+          {vb:raw statistics}
+          {vb:raw usermenu}
+        </ul>
+      </div>
+    </td>
+  </tr>
+</table>
+</div>
+{vb:raw footer}
+</body>
+</html>
+]]></template>
+		<template name="invoices_add_invoice" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+
+{vb:stylevar htmldoctype}
+<html xmlns="http://www.w3.org/1999/xhtml" dir="{vb:stylevar textdirection}" lang="{vb:stylevar languagecode}" id="vbulletin_html">
+<head>
+  <title>{vb:var vbphrase.invoices_add_invoice}</title>
+  {vb:raw headinclude}
+  <link rel="stylesheet" type="text/css" href="{vb:var vbcsspath}invoices.css" />
+  <link rel="stylesheet" href="invoices/javascripts/calendar.css">
+  <script language="JavaScript" src="invoices/javascripts/calendar_db.js"></script>
+</head>
+<body>
+{vb:raw header}
+{vb:raw navbar}
+<script language="JavaScript">
+function calculate() {
+
+    var itemquantity1 = document.invoice.itemquantity1.value;
+    var itemprice1 = document.invoice.itemprice1.value;
+    var itemnet1 = itemquantity1 * itemprice1;
+    var itemtax1 = document.invoice.itemtax1.value;
+    var itemtaxamount1 = (itemnet1 * itemtax1) / 100;
+    var itemtotal1 = itemnet1 + itemtaxamount1;
+    document.invoice.itemnet1.value = round(itemnet1);
+    document.invoice.itemtaxamount1.value = round(itemtaxamount1);
+    document.invoice.itemtotal1.value = round(itemtotal1);
+
+    var itemquantity2 = document.invoice.itemquantity2.value;
+    var itemprice2 = document.invoice.itemprice2.value;
+    var itemnet2 = itemquantity2 * itemprice2;
+    var itemtax2 = document.invoice.itemtax2.value;
+    var itemtaxamount2 = (itemnet2 * itemtax2) / 100;
+    var itemtotal2 = itemnet2 + itemtaxamount2;
+    document.invoice.itemnet2.value = round(itemnet2);
+    document.invoice.itemtaxamount2.value = round(itemtaxamount2);
+    document.invoice.itemtotal2.value = round(itemtotal2);
+
+    var itemquantity3 = document.invoice.itemquantity3.value;
+    var itemprice3 = document.invoice.itemprice3.value;
+    var itemnet3 = itemquantity3 * itemprice3;
+    var itemtax3 = document.invoice.itemtax3.value;
+    var itemtaxamount3 = (itemnet3 * itemtax3) / 100;
+    var itemtotal3 = itemnet3 + itemtaxamount3;
+    document.invoice.itemnet3.value = round(itemnet3);
+    document.invoice.itemtaxamount3.value = round(itemtaxamount3);
+    document.invoice.itemtotal3.value = round(itemtotal3);
+
+    var itemquantity4 = document.invoice.itemquantity4.value;
+    var itemprice4 = document.invoice.itemprice4.value;
+    var itemnet4 = itemquantity4 * itemprice4;
+    var itemtax4 = document.invoice.itemtax4.value;
+    var itemtaxamount4 = (itemnet4 * itemtax4) / 100;
+    var itemtotal4 = itemnet4 + itemtaxamount4;
+    document.invoice.itemnet4.value = round(itemnet4);
+    document.invoice.itemtaxamount4.value = round(itemtaxamount4);
+    document.invoice.itemtotal4.value = round(itemtotal4);
+
+    var itemquantity5 = document.invoice.itemquantity5.value;
+    var itemprice5 = document.invoice.itemprice5.value;
+    var itemnet5 = itemquantity5 * itemprice5;
+    var itemtax5 = document.invoice.itemtax5.value;
+    var itemtaxamount5 = (itemnet5 * itemtax5) / 100;
+    var itemtotal5 = itemnet5 + itemtaxamount5;
+    document.invoice.itemnet5.value = round(itemnet5);
+    document.invoice.itemtaxamount5.value = round(itemtaxamount5);
+    document.invoice.itemtotal5.value = round(itemtotal5);
+
+    var subtotal = round(itemnet1 + itemnet2 + itemnet3 + itemnet4 + itemnet5);
+    document.invoice.subtotal.value = round(subtotal);
+    var discount = document.invoice.discount.value;
+    var totalnet = round(subtotal - discount);
+    document.invoice.totalnet.value = round(totalnet);
+    var taxamount = round(itemtaxamount1 + itemtaxamount2 + itemtaxamount3 + itemtaxamount4 + itemtaxamount5);
+    document.invoice.taxamount.value = round(taxamount);
+    var shipping = round(document.invoice.shipping.value);
+    document.invoice.invoicetotal.value = round(totalnet + taxamount + shipping);
+}
+function round(x) {
+  return Math.round(x*100)/100;
+}
+</script>
+<div class="blockbody">
+<br />
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+  <tr>
+    <td width="70%" align="left" valign="top">
+<form class="block vbform" action="invoices.php?do=saveinvoice" method="post" enctype="multipart/form-data" name="invoice">
+<input type="hidden" name="id" value="{vb:raw id}" />
+<input type="hidden" name="userid" value="{vb:raw userid}" />
+<input type="hidden" name="customerid" value="{vb:raw customerid}" />
+<table cellpadding="2" cellspacing="2" width="100%" border="0">
+  <tr>
+    <td colspan="2" class="blockhead" align="center" width="100%">
+      <b>{vb:var vbphrase.invoices_add_invoice} {vb:var vbphrase.invoices_for_customer}</b>
+      <select name="customerid" size="1" onchange="window.location.href=this.options[this.selectedIndex].value">
+      <option value="invoices.php?do=addinvoice"<vb:if condition="$customerid==0"> selected="selected"</vb:if>>{vb:var vbphrase.invoices_select}</option>
+      {vb:raw customerlist}
+      </select>
+    </td>
+  </tr>
+  <tr><td colspan="2">&nbsp;</td></tr>
+  <tr>
+    <td align="left" valign="top">
+      {vb:raw company}
+    </td>
+    <td align="right">
+      <vb:if condition="!empty($logo)">
+        <img border="0" src="invoices/logos/{vb:raw logo}">
+      </vb:if>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" style="padding-top:5px;">{vb:var vbphrase.invoices_invoice_nbr}</td>
+    <td align="left" style="padding-top:5px;">
+      <input size="15" type="text" name="invoiceid" value="{vb:raw invoiceid}">
+    </td>
+  </tr>
+  <tr>
+    <td align="left" style="padding-top:5px;">{vb:var vbphrase.invoices_issuedate}</td>
+    <td align="left" style="padding-top:5px;">
+      <input size="15" type="text" name="issued" value="{vb:raw issued}">
+      <script language="JavaScript">
+	  var o_cal = new tcal ({
+		'formname': 'invoice',
+		'controlname': 'issued'
+	  });
+	  o_cal.a_tpl.yearscroll = true;
+	  o_cal.a_tpl.weekstart = 1;
+	  </script>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" style="padding-top:5px;">{vb:var vbphrase.invoices_duedate}</td>
+    <td align="left" style="padding-top:5px;">
+      <input size="15" type="text" name="duedate" value="{vb:raw duedate}">
+      <script language="JavaScript">
+	  var o_cal = new tcal ({
+		'formname': 'invoice',
+		'controlname': 'duedate'
+	  });
+	  o_cal.a_tpl.yearscroll = true;
+	  o_cal.a_tpl.weekstart = 1;
+	  </script>
+    </td>
+  </tr>
+  <tr><td colspan="2">&nbsp;</td></tr>
+  <tr>
+    <td colspan="2" align="left"><b><u>{vb:var vbphrase.invoices_invoice_to}</u></b></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="left">
+      {vb:raw cname}<br />
+      <vb:if condition="!empty($caddress)">
+        {vb:raw caddress}<br />
+      </vb:if>
+      <vb:if condition="!empty($ccity)">
+        {vb:raw ccity},&nbsp;
+      </vb:if>
+      <vb:if condition="!empty($cstate)">
+        {vb:raw cstate},&nbsp;
+      </vb:if>
+      <vb:if condition="!empty($czipcode)">
+        {vb:raw czipcode}
+      </vb:if>
+      <br />
+      <vb:if condition="!empty($ccountry)">
+        {vb:raw ccountry}<br />
+      </vb:if>
+      <vb:if condition="!empty($cphone)">
+        {vb:var vbphrase.invoices_phone}: {vb:raw cphone}<br />
+      </vb:if>
+      <vb:if condition="!empty($cemail)">
+        {vb:var vbphrase.invoices_email}: {vb:raw cemail}<br />
+      </vb:if>
+      <vb:if condition="!empty($cvatdetails)">
+        {vb:var vbphrase.invoices_vatdetails}: {vb:raw cvatdetails}<br />
+      </vb:if>
+    </td>
+  </tr>
+  <tr><td colspan="2">&nbsp;</td></tr>
+  <tr>
+    <td colspan="2">
+      <table width="100%" cellspacing="2" cellpadding="2">
+        <tr>
+          <td align="left">
+            <b>{vb:var vbphrase.invoices_item_desc}</b></td>
+          <td align="center">
+            <b>{vb:var vbphrase.invoices_qty}</b></td>
+          <td align="center">
+            <b>{vb:var vbphrase.invoices_price}</b></td>
+          <td align="center">
+            <b>{vb:var vbphrase.invoices_net}</b></td>
+          <td align="center">
+            <b>{vb:var vbphrase.invoices_tax}</b></td>
+          <td align="center">
+            <b>{vb:var vbphrase.invoices_tax_sum}</b></td>
+          <td align="center">
+            <b>{vb:var vbphrase.invoices_gross}</b></td>
+        </tr>
+        <tr><td colspan="7"><hr /></td></tr>
+        <tr>
+          <td align="left">
+            <input size="45" type="text" name="itemname1">
+          </td>
+          <td align="right">
+            <input size="3" type="text" name="itemquantity1" onchange="calculate();">
+          </td>
+          <td align="right">
+            <input size="8" type="text" name="itemprice1" onchange="calculate();">
+          </td>
+          <td align="right">
+            <input size="8" type="text" name="itemnet1" style="text-align:right;" readonly="readonly">
+          </td>
+          <td align="right">
+            <input size="3" type="text" name="itemtax1" value="{vb:raw itemtax1}" onchange="calculate();">
+          </td>
+          <td align="right">
+            <input size="8" type="text" name="itemtaxamount1" style="text-align:right;" readonly="readonly">
+          </td>
+          <td align="right">
+            <input size="10" type="text" name="itemtotal1" style="text-align:right;" readonly="readonly">
+          </td>
+        </tr>
+        <tr>
+          <td align="left" style="padding-top:5px;">
+            <input size="45" type="text" name="itemname2">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="3" type="text" name="itemquantity2" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemprice2" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemnet2" style="text-align:right;" readonly="readonly">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="3" type="text" name="itemtax2" value="{vb:raw itemtax2}" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemtaxamount2" style="text-align:right;" readonly="readonly">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="10" type="text" name="itemtotal2" style="text-align:right;" readonly="readonly">
+          </td>
+        </tr>
+        <tr>
+          <td align="left" style="padding-top:5px;">
+            <input size="45" type="text" name="itemname3">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="3" type="text" name="itemquantity3" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemprice3" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemnet3" style="text-align:right;" readonly="readonly">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="3" type="text" name="itemtax3" value="{vb:raw itemtax3}" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemtaxamount3" style="text-align:right;" readonly="readonly">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="10" type="text" name="itemtotal3" style="text-align:right;" readonly="readonly">
+          </td>
+        </tr>
+        <tr>
+          <td align="left" style="padding-top:5px;">
+            <input size="45" type="text" name="itemname4">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="3" type="text" name="itemquantity4" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemprice4" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemnet4" style="text-align:right;" readonly="readonly">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="3" type="text" name="itemtax4" value="{vb:raw itemtax4}" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemtaxamount4" style="text-align:right;" readonly="readonly">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="10" type="text" name="itemtotal4" style="text-align:right;" readonly="readonly">
+          </td>
+        </tr>
+        <tr>
+          <td align="left" style="padding-top:5px;">
+            <input size="45" type="text" name="itemname5">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="3" type="text" name="itemquantity5" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemprice5" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemnet5" style="text-align:right;" readonly="readonly">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="3" type="text" name="itemtax5" value="{vb:raw itemtax5}" onchange="calculate();">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="8" type="text" name="itemtaxamount5" style="text-align:right;" readonly="readonly">
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="10" type="text" name="itemtotal5" style="text-align:right;" readonly="readonly">
+          </td>
+        </tr>
+        <tr><td colspan="7"><hr /></td></tr>
+        <tr>
+          <td colspan="4" align="left">
+            <b><u>{vb:var vbphrase.invoices_terms_notes}</u></b></td>
+          <td colspan="2" align="right">
+            {vb:var vbphrase.invoices_subtotal}
+          </td>
+          <td align="right">
+            <input size="10" type="text" name="subtotal" style="text-align:right;" readonly="readonly">
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4" rowspan="5" align="left" valign="top" style="padding-top:5px;">
+            <textarea name="terms" rows="7" cols="70">{vb:raw terms}</textarea>
+          </td>
+          <td colspan="2" align="right" style="padding-top:5px;">
+            {vb:var vbphrase.invoices_discount}
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="10" type="text" name="discount" onchange="calculate();">
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" align="right" style="padding-top:5px;">
+            {vb:var vbphrase.invoices_total}
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="10" type="text" name="totalnet" style="text-align:right;" readonly="readonly">
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" align="right" style="padding-top:5px;">
+            {vb:var vbphrase.invoices_tax_amount}
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="10" type="text" name="taxamount" style="text-align:right;" readonly="readonly">
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" align="right" style="padding-top:5px;">
+            {vb:var vbphrase.invoices_shipping}
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="10" type="text" name="shipping" onchange="calculate();">
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" align="right" style="padding-top:5px;">
+            {vb:var vbphrase.invoices_balance_due}
+          </td>
+          <td align="right" style="padding-top:5px;">
+            <input size="10" type="text" name="invoicetotal" style="text-align:right;" readonly="readonly">
+          </td>
+        </tr>
+        <tr><td colspan="7">&nbsp;</td></tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" class="blocksubhead" colspan="2">
+      <input type="hidden" name="customerid" value="{vb:raw customerid}" />
+      <input type="submit" class="button" name="sbutton" value="{vb:var vbphrase.invoices_submit}">
+    </td>
+  </tr>
+</table>
+</form>
+    </td>
+    <td align="left" valign="top" width="30%" style="padding-left:10px;">
+      <div id="sidebar_container">
+        <ul id="sidebar">
+          {vb:raw statistics}
+          {vb:raw usermenu}
+        </ul>
+      </div>
+    </td>
+  </tr>
+</table>
+</div>
+{vb:raw footer}
+</body>
+</html>
+]]></template>
+		<template name="invoices_browse_customers" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+
+<tr>
+  <td class="blockrow" align="left">
+    <a href="invoices.php?do=viewcustomer&customerid={vb:raw id}">{vb:raw name}</a>
+  </td>
+  <td class="blockrow" align="right">{vb:raw paid}- {vb:raw currency}{vb:raw paidamount}</td>
+  <td class="blockrow" align="right">{vb:raw unpaid}- {vb:raw currency}{vb:raw unpaidamount}</td>
+  <td class="blockrow" align="right">{vb:raw overdue}- {vb:raw currency}{vb:raw overdueamount}</td>
+  <td class="blockrow" align="center">
+    <select size="1" style="width:100px;" onchange="window.location.href=this.options[this.selectedIndex].value">
+    <option value="invoices.php" selected="selected">{vb:var vbphrase.invoices_select}</option>
+    <option value="invoices.php?do=addeditcustomer&customerid={vb:raw id}">{vb:var vbphrase.invoices_edit}</option>
+    <option value="invoices.php?do=deletecustomer&customerid={vb:raw id}">{vb:var vbphrase.invoices_delete}</option>
+    </select>
+  </td>
+</tr>
+]]></template>
+		<template name="invoices_browse_invoices" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+
+<tr>
+  <td class="blockrow" align="right">
+    <a target="_blank" href="invoices.php?do=invoice&invoiceid={vb:raw id}&action=2">{vb:raw id}</a>
+  </td>
+  <td class="blockrow" align="center">
+    <vb:if condition="$sent==1">
+      <img border="0" src="invoices/images/sent.png">
+    <vb:else />
+      <img border="0" src="invoices/images/attention.png">
+    </vb:if>
+  </td>
+  <td class="blockrow" align="left">
+    <a href="invoices.php?do=viewcustomer&customerid={vb:raw customerid}">{vb:raw customername}</a>
+  </td>
+  <td class="blockrow" align="center">{vb:raw issued}</td>
+  <td class="blockrow" align="center">{vb:raw duedate}</td>
+  <td class="blockrow" align="center">{vb:raw paid}</td>
+  <td class="blockrow" align="right">
+    <vb:if condition="$isvoid==0">
+      {vb:raw currency}{vb:raw invoicetotal}
+    <vb:else />
+      <strike>{vb:raw currency}{vb:raw invoicetotal}</strike>
+    </vb:if>
+  </td>
+  <td class="blockrow" align="center">
+    <select size="1" style="width:100px;" onchange="window.location.href=this.options[this.selectedIndex].value">
+    <option value="invoices.php" selected="selected">{vb:var vbphrase.invoices_select}</option>
+    <vb:if condition="$isvoid==0">
+      <option value="invoices.php?do=invoice&invoiceid={vb:raw id}&action=1">{vb:var vbphrase.invoices_send_invoice}</option>
+    </vb:if>
+    <vb:if condition="$isvoid==0">
+      <vb:if condition="empty($paid)">
+        <option value="invoices.php?do=invoice&invoiceid={vb:raw id}&action=4">{vb:var vbphrase.invoices_send_overdue}</option>
+      </vb:if>
+    </vb:if>
+    <option value="invoices.php?do=invoice&invoiceid={vb:raw id}&action=2">{vb:var vbphrase.invoices_preview}</option>
+    <option value="invoices.php?do=invoice&invoiceid={vb:raw id}&action=3">{vb:var vbphrase.invoices_download}</option>
+    <vb:if condition="$isvoid==0">
+      <vb:if condition="empty($paid)">
+        <option value="invoices.php?do=invoice&invoiceid={vb:raw id}&action=5">{vb:var vbphrase.invoices_mark_paid}</option>
+      <vb:else />
+        <option value="invoices.php?do=changestatus&invoiceid={vb:raw id}&status=1">{vb:var vbphrase.invoices_mark_unpaid}</option>
+      </vb:if>
+    </vb:if>
+    <vb:if condition="empty($paid)">
+      <vb:if condition="$isvoid==0">
+        <option value="invoices.php?do=changestatus&invoiceid={vb:raw id}&status=2">{vb:var vbphrase.invoices_mark_void}</option>
+      <vb:else />
+        <option value="invoices.php?do=changestatus&invoiceid={vb:raw id}&status=3">{vb:var vbphrase.invoices_mark_unvoid}</option>
+      </vb:if>
+    </vb:if>
+    </select>
+  </td>
+</tr>
+]]></template>
+		<template name="invoices_customers" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+
+{vb:stylevar htmldoctype}
+<html xmlns="http://www.w3.org/1999/xhtml" dir="{vb:stylevar textdirection}" lang="{vb:stylevar languagecode}" id="vbulletin_html">
+<head>
+  <title>{vb:var vbphrase.invoices_browse_customers}</title>
+  {vb:raw headinclude}
+  <link rel="stylesheet" type="text/css" href="{vb:var vbcsspath}invoices.css" />
+</head>
+<body>
+{vb:raw header}
+{vb:raw navbar}
+<div class="blockbody">
+<br />
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+  <tr>
+    <td width="70%" align="left" valign="top">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+          <td colspan="5" class="blockhead" align="center">
+            <b>{vb:var vbphrase.invoices_browse_customers}</b>
+          </td>
+        </tr>
+        <tr>
+          <td class="blocksubhead" align="left">{vb:var vbphrase.invoices_name}</td>
+          <td class="blocksubhead" align="right">{vb:var vbphrase.invoices_paid} </td>
+          <td class="blocksubhead" align="right">{vb:var vbphrase.invoices_unpaid} </td>
+          <td class="blocksubhead" align="right">{vb:var vbphrase.invoices_overdue} </td>
+          <td class="blocksubhead" align="center">{vb:var vbphrase.invoices_actions}</td>
+        </tr>
+        {vb:raw browse_customers}
+      </table>
+      <vb:if condition="$pagenav">
+        <div align="right" style="margin-top:5px;">{vb:raw pagenav}</div>
+      </vb:if>
+    </td>
+    <td align="left" valign="top" width="30%" style="padding-left:10px;">
+      <div id="sidebar_container">
+        <ul id="sidebar">
+          {vb:raw statistics}
+          {vb:raw usermenu}
+        </ul>
+      </div>
+    </td>
+  </tr>
+</table>
+</div>
+<br />
+{vb:raw footer}
+</body>
+</html>
+]]></template>
+		<template name="invoices_customer_invoices" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+
+<tr>
+  <td class="blockrow" align="right">
+    <a target="_blank" href="invoices.php?do=invoice&invoiceid={vb:raw id}&action=2">{vb:raw id}</a>
+  </td>
+  <td class="blockrow" align="center">
+    <vb:if condition="$sent==1">
+      <img border="0" src="invoices/images/sent.png">
+    <vb:else />
+      <img border="0" src="invoices/images/attention.png">
+    </vb:if>
+  </td>
+  <td class="blockrow" align="center">{vb:raw issued}</td>
+  <td class="blockrow" align="center">{vb:raw duedate}</td>
+  <td class="blockrow" align="center">{vb:raw paid}</td>
+  <td class="blockrow" align="right">
+    <vb:if condition="$isvoid==0">
+      {vb:raw currency}{vb:raw total}
+    <vb:else />
+      <strike>{vb:raw currency}{vb:raw total}</strike>
+    </vb:if>
+  </td>
+  <td class="blockrow" align="right">
+    <vb:if condition="$isvoid==0">
+      {vb:raw currency}{vb:raw invoicetotal}
+    <vb:else />
+      <strike>{vb:raw currency}{vb:raw invoicetotal}</strike>
+    </vb:if>
+  </td>
+</tr>
+]]></template>
+		<template name="invoices_main" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+
+{vb:stylevar htmldoctype}
+<html xmlns="http://www.w3.org/1999/xhtml" dir="{vb:stylevar textdirection}" lang="{vb:stylevar languagecode}" id="vbulletin_html">
+<head>
+  <title>{vb:var vbphrase.invoices_navbar}</title>
+  {vb:raw headinclude}
+  <link rel="stylesheet" type="text/css" href="{vb:var vbcsspath}invoices.css" />
+  <link rel="stylesheet" href="invoices/includes/thumbnailviewer.css" type="text/css" />
+  <script src="invoices/includes/thumbnailviewer.js" type="text/javascript"></script>
+</head>
+<body>
+{vb:raw header}
+{vb:raw navbar}
+<div class="blockbody">
+<br />
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+  <tr>
+    <td width="70%" align="left" valign="top">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+          <td colspan="8" class="blockhead" align="center">
+            <vb:if condition="$status==0">
+              <b>{vb:var vbphrase.invoices_browse_invoices}</b>
+            </vb:if>
+            <vb:if condition="$status==1">
+              <b>{vb:var vbphrase.invoices_browse_paid}</b>
+            </vb:if>
+            <vb:if condition="$status==2">
+              <b>{vb:var vbphrase.invoices_browse_unpaid}</b>
+            </vb:if>
+            <vb:if condition="$status==3">
+              <b>{vb:var vbphrase.invoices_browse_overdue}</b>
+            </vb:if>
+            <vb:if condition="$status==4">
+              <b>{vb:var vbphrase.invoices_browse_isvoid}</b>
+            </vb:if>
+          </td>
+        </tr>
+        <tr>
+          <td class="blocksubhead" align="center">{vb:var vbphrase.invoices_id}</td>
+          <td class="blocksubhead" align="center"><img border="0" src="invoices/images/invsent.png"></td>
+          <td class="blocksubhead" align="left">{vb:var vbphrase.invoices_customer}</td>
+          <td class="blocksubhead" align="center">{vb:var vbphrase.invoices_issued}</td>
+          <td class="blocksubhead" align="center">{vb:var vbphrase.invoices_duedate}</td>
+          <td class="blocksubhead" align="center">{vb:var vbphrase.invoices_paid}</td>
+          <td class="blocksubhead" align="center">{vb:var vbphrase.invoices_amount}</td>
+          <td class="blocksubhead" align="center">{vb:var vbphrase.invoices_actions}</td>
+        </tr>
+        {vb:raw browse_invoices}
+      </table>
+      <vb:if condition="$pagenav">
+        <div align="right" style="margin-top:5px;">{vb:raw pagenav}</div>
+      </vb:if>
+    </td>
+    <td align="left" valign="top" width="30%" style="padding-left:10px;">
+      <div id="sidebar_container">
+        <ul id="sidebar">
+          {vb:raw statistics}
+          {vb:raw usermenu}
+        </ul>
+      </div>
+    </td>
+  </tr>
+</table>
+</div>
+{vb:raw footer}
+</body>
+</html>
+]]></template>
+		<template name="invoices_phrases" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+
+{vb:stylevar htmldoctype}
+<html xmlns="http://www.w3.org/1999/xhtml" dir="{vb:stylevar textdirection}" lang="{vb:stylevar languagecode}" id="vbulletin_html">
+<head>
+  <title>{vb:var vbphrase.invoices_invoice_phrases}</title>
+  {vb:raw headinclude}
+  <link rel="stylesheet" type="text/css" href="{vb:var vbcsspath}invoices.css" />
+</head>
+<body>
+{vb:raw header}
+{vb:raw navbar}
+<div class="blockbody">
+<br />
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+  <tr>
+    <td width="70%" align="left" valign="top">
+<form class="block vbform" action="invoices.php?do=updatephrases" method="post" enctype="multipart/form-data" name="vbform">
+<input type="hidden" name="id" value="{vb:raw id}" />
+<input type="hidden" name="userid" value="{vb:raw userid}" />
+<table cellpadding="2" cellspacing="2" width="100%" border="0">
+  <tr>
+    <td colspan="2" class="blockhead" align="center" width="100%">
+      <b>{vb:var vbphrase.invoices_invoice_phrases}</b>
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_invoice}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="invoice" size="50" value="{vb:raw invoice}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_invoice_nbr}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="invoicenbr" size="50" value="{vb:raw invoicenbr}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_invoice_to}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="invoiceto" size="50" value="{vb:raw invoiceto}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_issuedate}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="issued" size="50" value="{vb:raw issued}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_duedate}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="duedate" size="50" value="{vb:raw duedate}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_unpaid}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="unpaid" size="50" value="{vb:raw unpaid}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_paid}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="paid" size="50" value="{vb:raw paid}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_overdue}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="overdue" size="50" value="{vb:raw overdue}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_item_desc}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="item" size="50" value="{vb:raw item}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_qty}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="quantity" size="50" value="{vb:raw quantity}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_price}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="price" size="50" value="{vb:raw price}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_net}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="net" size="50" value="{vb:raw net}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_tax}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="tax" size="50" value="{vb:raw tax}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_tax_sum}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="taxsum" size="50" value="{vb:raw taxsum}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_gross}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="gross" size="50" value="{vb:raw gross}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_subtotal}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="subtotal" size="50" value="{vb:raw subtotal}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_discount}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="discount" size="50" value="{vb:raw discount}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_total}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="totalnet" size="50" value="{vb:raw totalnet}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_tax_amount}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="taxamount" size="50" value="{vb:raw taxamount}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_shipping}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="shipping" size="50" value="{vb:raw shipping}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_balance_due}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="balancedue" size="50" value="{vb:raw balancedue}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_terms_notes}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="terms" size="50" value="{vb:raw terms}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_phone}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="phone" size="50" value="{vb:raw phone}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_email}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="email" size="50" value="{vb:raw email}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_vatdetails}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="vatdetails" size="50" value="{vb:raw vatdetails}">
+    </td>
+  </tr>
+  <tr>
+    <td align="center" class="blocksubhead" colspan="2">
+      <input type="submit" class="button" name="sbutton" value="{vb:var vbphrase.invoices_submit}">
+    </td>
+  </tr>
+</table>
+</form>
+    </td>
+    <td align="left" valign="top" width="30%" style="padding-left:10px;">
+      <div id="sidebar_container">
+        <ul id="sidebar">
+          {vb:raw statistics}
+          {vb:raw usermenu}
+        </ul>
+      </div>
+    </td>
+  </tr>
+</table>
+</div>
+{vb:raw footer}
+</body>
+</html>
+]]></template>
+		<template name="invoices_settings" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+
+{vb:stylevar htmldoctype}
+<html xmlns="http://www.w3.org/1999/xhtml" dir="{vb:stylevar textdirection}" lang="{vb:stylevar languagecode}" id="vbulletin_html">
+<head>
+  <title>{vb:var vbphrase.invoices_settings}</title>
+  {vb:raw headinclude}
+  <link rel="stylesheet" type="text/css" href="{vb:var vbcsspath}invoices.css" />
+  <link rel="stylesheet" href="invoices/includes/thumbnailviewer.css" type="text/css" />
+  <script src="invoices/includes/thumbnailviewer.js" type="text/javascript"></script>
+</head>
+<body>
+{vb:raw header}
+{vb:raw navbar}
+<script type="text/javascript">
+function validateForm_vbform()
+{
+  if(document.forms["vbform"].company.value.length == 0) {
+    alert('Empty Company');
+    return false;
+  }
+  if(document.forms["vbform"].dateformat.value.length == 0) {
+    alert('Empty Date format');
+    return false;
+  }
+  if(document.forms["vbform"].currency.value.length == 0) {
+    alert('Empty Currency');
+    return false;
+  }
+  if(document.forms["vbform"].currency_long.value.length == 0) {
+    alert('Empty Currency long');
+    return false;
+  }
+  if(document.forms["vbform"].fromname.value.length == 0) {
+    alert('Empty From Name');
+    return false;
+  }
+  if(document.forms["vbform"].fromemail.value.length == 0) {
+    alert('Empty From Email');
+    return false;
+  }
+  return true;
+}
+</script>
+<div class="blockbody">
+<br />
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+  <tr>
+    <td width="70%" align="left" valign="top">
+<form class="block vbform" action="invoices.php?do=updatesettings" method="post" enctype="multipart/form-data" name="vbform">
+<input type="hidden" name="id" value="{vb:raw id}" />
+<input type="hidden" name="userid" value="{vb:raw userid}" />
+<input type="hidden" name="oldlogo" value="{vb:raw oldlogo}" />
+<table cellpadding="2" cellspacing="2" width="100%" border="0">
+  <tr>
+    <td colspan="2" class="blockhead" align="center" width="100%">
+      <b>{vb:var vbphrase.invoices_settings}</b>
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" width="30%" align="left">
+      {vb:var vbphrase.invoices_company}
+    </td>
+    <td class="blockrow" width="70%" align="left">
+      <textarea name="company" rows="7" cols="50">{vb:raw company}</textarea>
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_paypal}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="radio" name="paypal" value="1" <vb:if condition="$paypal==1">checked=checked</vb:if> />
+      {vb:var vbphrase.invoices_yes}&nbsp;&nbsp;
+      <input type="radio" name="paypal" value="0" <vb:if condition="$paypal==0">checked=checked</vb:if> />
+      {vb:var vbphrase.invoices_no}
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_paypal_email}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="paypal_email" size="50" value="{vb:raw paypal_email}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_priceformat}
+    </td>
+    <td class="blockrow" align="left">
+      <select name="priceformat" size="1">
+      <option value="1"<vb:if condition="$priceformat==1"> selected="selected"</vb:if>>999.999</option>
+      <option value="2"<vb:if condition="$priceformat==2"> selected="selected"</vb:if>>999.999,99</option>
+      <option value="3"<vb:if condition="$priceformat==3"> selected="selected"</vb:if>>999,999</option>
+      <option value="4"<vb:if condition="$priceformat==4"> selected="selected"</vb:if>>999,999.99</option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_dateformat}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="dateformat" size="50" value="{vb:raw dateformat}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_currency}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="currency" size="50" value="{vb:raw currency}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_currency_long}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="currency_long" size="50" value="{vb:raw currency_long}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_vat}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="vat" size="50" value="{vb:raw vat}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_next_invoice}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="nextinvoice" size="50" value="{vb:raw nextinvoice}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_charset}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="charset" size="50" value="{vb:raw charset}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_chardir}
+    </td>
+    <td class="blockrow" align="left">
+      <select name="chardir" size="1">
+      <option value="ltr"<vb:if condition="$chardir=='ltr'"> selected="selected"</vb:if>>{vb:var vbphrase.invoices_ltr}</option>
+      <option value="rtl"<vb:if condition="$chardir=='rtl'"> selected="selected"</vb:if>>{vb:var vbphrase.invoices_rtl}</option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_fromname}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="fromname" size="50" value="{vb:raw fromname}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_fromemail}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="fromemail" size="50" value="{vb:raw fromemail}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_perpage}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="perpage" size="50" value="{vb:raw perpage}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left" valign="top">
+      {vb:var vbphrase.invoices_logo}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="file" name="logo" size="20" /><br />
+      <vb:if condition="!empty($logo)">
+        <img border="0" src="invoices/logos/{vb:raw $logo}" align="left" style="padding-top:5px;"><br /><br />
+      <vb:else />
+        <img border="0" src="invoices/images/nophoto.gif" align="left" style="padding-top:5px;"><br /><br />
+      </vb:if>
+      <vb:if condition="!empty($logo)">
+        &nbsp;&nbsp;<input type="checkbox" name="removelogo" value="1">&nbsp;{vb:var vbphrase.invoices_remove}<br />
+      </vb:if>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" class="blocksubhead" colspan="2">
+      <input type="submit" class="button" name="sbutton" value="{vb:var vbphrase.invoices_submit}" onclick="return validateForm_vbform()">
+    </td>
+  </tr>
+</table>
+</form>
+    </td>
+    <td align="left" valign="top" width="30%" style="padding-left:10px;">
+      <div id="sidebar_container">
+        <ul id="sidebar">
+          {vb:raw statistics}
+          {vb:raw usermenu}
+        </ul>
+      </div>
+    </td>
+  </tr>
+</table>
+</div>
+{vb:raw footer}
+</body>
+</html>
+]]></template>
+		<template name="invoices_statistics" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+<li>
+  <div class="block smaller">
+  	<h4 class="blocksubhead">
+  	<a href="#top" id="collapse_statistics" class="collapse"><img src="{vb:stylevar imgdir_button}/collapse_40b.png" alt="" /></a>
+  	<img border="0" src="invoices/images/statistics.png" align="left">&nbsp;{vb:var vbphrase.invoices_my_statistics}
+    </h4>
+	<div class="blockbody" id="statistics">
+      <ol class="nobullets blockrow">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td class="menu" width="50%" align="left">
+              &raquo;&nbsp;<a href="invoices.php?do=customers">{vb:var vbphrase.invoices_customers}</a></td>
+            <td class="menu" width="15%" align="right">{vb:raw customers}</td>
+            <td class="menu" width="35%" align="right">&nbsp;</td>
+          </tr>
+          <tr>
+            <td class="menu" align="left">
+              &raquo;&nbsp;<a href="invoices.php?do=main&status=1">{vb:var vbphrase.invoices_paid_invoices}</a>
+            </td>
+            <td class="menu" align="right">{vb:raw paid}</td>
+            <td class="menu" align="right">{vb:raw currency}{vb:raw paidamount}</td>
+          </tr>
+          <tr>
+            <td class="menu" align="left">
+              &raquo;&nbsp;<a href="invoices.php?do=main&status=2">{vb:var vbphrase.invoices_unpaid_invoices}</a>
+            </td>
+            <td class="menu" align="right">{vb:raw unpaid}</td>
+            <td class="menu" align="right">{vb:raw currency}{vb:raw unpaidamount}</td>
+          </tr>
+          <tr>
+            <td class="menu" align="left">
+              &raquo;&nbsp;<a href="invoices.php?do=main&status=3">{vb:var vbphrase.invoices_overdue_invoices}</a>
+            </td>
+            <td class="menu" align="right">{vb:raw overdue}</td>
+            <td class="menu" align="right">{vb:raw currency}{vb:raw overdueamount}</td>
+          </tr>
+          <tr>
+            <td class="menu" align="left">
+              &raquo;&nbsp;<a href="invoices.php?do=main&status=4">{vb:var vbphrase.invoices_isvoid_invoices}</a>
+            </td>
+            <td class="menu" align="right">{vb:raw isvoid}</td>
+            <td class="menu" align="right">{vb:raw currency}{vb:raw isvoidamount}</td>
+          </tr>
+          <tr>
+            <td class="menu" align="left">
+              &raquo;&nbsp;<a href="invoices.php?do=main&status=0">{vb:var vbphrase.invoices_total_invoices}</a>
+            </td>
+            <td class="menu" align="right">{vb:raw inv}</td>
+            <td class="menu" align="right">{vb:raw currency}{vb:raw invamount}</td>
+          </tr>
+        </table>
+      </ol>
+	</div>
+  </div>
+  <div class="underblock"></div>
+</li>
+]]></template>
+		<template name="invoices_templates" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+
+{vb:stylevar htmldoctype}
+<html xmlns="http://www.w3.org/1999/xhtml" dir="{vb:stylevar textdirection}" lang="{vb:stylevar languagecode}" id="vbulletin_html">
+<head>
+  <title>{vb:var vbphrase.invoices_templates}</title>
+  {vb:raw headinclude}
+  <link rel="stylesheet" type="text/css" href="{vb:var vbcsspath}invoices.css" />
+  <link rel="stylesheet" href="invoices/includes/thumbnailviewer.css" type="text/css" />
+  <script src="invoices/includes/thumbnailviewer.js" type="text/javascript"></script>
+</head>
+<body>
+{vb:raw header}
+{vb:raw navbar}
+<script type="text/javascript" src="invoices/javascripts/richedit.js"></script>
+<div class="blockbody">
+<br />
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+  <tr>
+    <td width="70%" align="left" valign="top">
+<form class="block vbform" action="invoices.php?do=updatetemplates" method="post" enctype="multipart/form-data" name="vbform" onClick="rtoStore()">
+<input type="hidden" name="id" value="{vb:raw id}" />
+<input type="hidden" name="userid" value="{vb:raw userid}" />
+<table cellpadding="2" cellspacing="2" width="100%" border="0">
+  <tr>
+    <td colspan="2" class="blockhead" align="center" width="100%">
+      <b>{vb:var vbphrase.invoices_email_1}</b>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="blocksubhead" align="center" width="100%">
+      {vb:var vbphrase.invoices_info_replace}<br />
+      {vb:var vbphrase.invoices_replace_customer}<br />
+      {vb:var vbphrase.invoices_replace_invoice}<br />
+      {vb:var vbphrase.invoices_replace_amount}
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_emailtitle}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="emailtitle1" size="50" value="{vb:raw emailtitle1}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_emailbody}
+    </td>
+    <td class="blockrow" align="left">
+      <script type="text/javascript"> <!--
+        var editor1 = new EDITOR();
+        editor1.textHeight = 250;
+        editor1.setFocus = false;
+        editor1.fieldName = "emailbody1";
+        editor1.create("{vb:raw emailbody1}");
+      //--> </script>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="blockhead" align="center" width="100%">
+      <b>{vb:var vbphrase.invoices_email_2}</b>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="blocksubhead" align="center" width="100%">
+      {vb:var vbphrase.invoices_info_replace}<br />
+      {vb:var vbphrase.invoices_replace_customer}<br />
+      {vb:var vbphrase.invoices_replace_invoice}<br />
+      {vb:var vbphrase.invoices_replace_amount}
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_emailtitle}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="emailtitle2" size="50" value="{vb:raw emailtitle2}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_emailbody}
+    </td>
+    <td class="blockrow" align="left">
+      <script type="text/javascript"> <!--
+        var editor2 = new EDITOR();
+        editor2.textHeight = 250;
+        editor2.setFocus = false;
+        editor2.fieldName = "emailbody2";
+        editor2.create("{vb:raw emailbody2}");
+      //--> </script>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="blockhead" align="center" width="100%">
+      <b>{vb:var vbphrase.invoices_email_3}</b>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="blocksubhead" align="center" width="100%">
+      {vb:var vbphrase.invoices_info_replace}<br />
+      {vb:var vbphrase.invoices_replace_customer}<br />
+      {vb:var vbphrase.invoices_replace_invoice}<br />
+      {vb:var vbphrase.invoices_replace_amount}
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_emailtitle}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="emailtitle3" size="50" value="{vb:raw emailtitle3}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_emailbody}
+    </td>
+    <td class="blockrow" align="left">
+      <script type="text/javascript"> <!--
+        var editor3 = new EDITOR();
+        editor3.textHeight = 250;
+        editor3.setFocus = false;
+        editor3.fieldName = "emailbody3";
+        editor3.create("{vb:raw emailbody3}");
+      //--> </script>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="blockhead" align="center" width="100%">
+      <b>{vb:var vbphrase.invoices_email_4}</b>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="blocksubhead" align="center" width="100%">
+      {vb:var vbphrase.invoices_info_replace}<br />
+      {vb:var vbphrase.invoices_replace_customer}<br />
+      {vb:var vbphrase.invoices_replace_invoice}<br />
+      {vb:var vbphrase.invoices_replace_amount}
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_emailtitle}
+    </td>
+    <td class="blockrow" align="left">
+      <input type="text" name="emailtitle4" size="50" value="{vb:raw emailtitle4}">
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_emailbody}
+    </td>
+    <td class="blockrow" align="left">
+      <script type="text/javascript"> <!--
+        var editor4 = new EDITOR();
+        editor4.textHeight = 250;
+        editor4.setFocus = false;
+        editor4.fieldName = "emailbody4";
+        editor4.create("{vb:raw emailbody4}");
+      //--> </script>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="blockhead" align="center" width="100%">
+      <b>{vb:var vbphrase.invoices_email_footer}</b>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="blocksubhead" align="center" width="100%">
+      {vb:var vbphrase.invoices_info_replace}<br />
+      {vb:var vbphrase.invoices_replace_customer}<br />
+      {vb:var vbphrase.invoices_replace_invoice}<br />
+      {vb:var vbphrase.invoices_replace_amount}
+    </td>
+  </tr>
+  <tr>
+    <td class="blockrow" align="left">
+      {vb:var vbphrase.invoices_emailbody}
+    </td>
+    <td class="blockrow" align="left">
+      <script type="text/javascript"> <!--
+        var editor5 = new EDITOR();
+        editor5.textHeight = 75;
+        editor5.setFocus = false;
+        editor5.fieldName = "emailfooter";
+        editor5.create("{vb:raw emailfooter}");
+      //--> </script>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" class="blocksubhead" colspan="2">
+      <input type="submit" class="button" name="sbutton" value="{vb:var vbphrase.invoices_submit}">
+    </td>
+  </tr>
+</table>
+</form>
+    </td>
+    <td align="left" valign="top" width="30%" style="padding-left:10px;">
+      <div id="sidebar_container">
+        <ul id="sidebar">
+          {vb:raw statistics}
+          {vb:raw usermenu}
+        </ul>
+      </div>
+    </td>
+  </tr>
+</table>
+</div>
+{vb:raw footer}
+</body>
+</html>
+]]></template>
+		<template name="invoices_user_menu" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+<li>
+  <div class="block smaller">
+  	<h4 class="blocksubhead">
+  	<a href="#top" id="collapse_usermenu" class="collapse"><img src="{vb:stylevar imgdir_button}/collapse_40b.png" alt="" /></a>
+  	<img border="0" src="invoices/images/actions.png" align="left">&nbsp;{vb:var vbphrase.invoices_choose_action}
+  	</h4>
+  	<div class="blockbody" id="usermenu">
+  	  <ol class="nobullets blockrow">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td class="menu" width="100%" align="left">
+              <b>&raquo;&nbsp;<a href="invoices.php?do=addeditcustomer">{vb:var vbphrase.invoices_add_customer}</b></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="menu" width="100%" align="left">
+              <b>&raquo;&nbsp;<a href="invoices.php?do=addinvoice">{vb:var vbphrase.invoices_issue_invoice}</b></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="menu" width="100%" align="left">
+              <b>&raquo;&nbsp;<a href="invoices.php?do=settings">{vb:var vbphrase.invoices_settings}</b></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="menu" width="100%" align="left">
+              <b>&raquo;&nbsp;<a href="invoices.php?do=templates">{vb:var vbphrase.invoices_templates}</b></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="menu" width="100%" align="left">
+              <b>&raquo;&nbsp;<a href="invoices.php?do=phrases">{vb:var vbphrase.invoices_invoice_phrases}</b></a>
+            </td>
+          </tr>
+        </table>
+      </ol>
+    </div>
+  </div>
+  <div class="underblock"></div>
+</li>
+]]></template>
+		<template name="invoices_view_customer" templatetype="template" date="1160112327" username="" version="1.0.0"><![CDATA[
+
+{vb:stylevar htmldoctype}
+<html xmlns="http://www.w3.org/1999/xhtml" dir="{vb:stylevar textdirection}" lang="{vb:stylevar languagecode}" id="vbulletin_html">
+<head>
+  <title>{vb:var vbphrase.invoices_browse_customers}</title>
+  {vb:raw headinclude}
+  <link rel="stylesheet" type="text/css" href="{vb:var vbcsspath}invoices.css" />
+</head>
+<body>
+{vb:raw header}
+{vb:raw navbar}
+<div class="blockbody">
+<br />
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+  <tr>
+    <td width="70%" align="left" valign="top">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+          <td colspan="7" class="blockhead" align="center">
+            <b>{vb:raw name}</b>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3" class="blockrow" align="left">{vb:var vbphrase.invoices_name}</td>
+          <td colspan="4" class="blockrow" align="left"><b>{vb:raw name}</b></td>
+        </tr>
+        <tr>
+          <td colspan="3" class="blockrow" align="left">{vb:var vbphrase.invoices_address}</td>
+          <td colspan="4" class="blockrow" align="left"><b>{vb:raw address}</b></td>
+        </tr>
+        <tr>
+          <td colspan="3" class="blockrow" align="left">{vb:var vbphrase.invoices_zipcode_city}</td>
+          <td colspan="4" class="blockrow" align="left"><b>{vb:raw zipcode} {vb:raw city}</b></td>
+        </tr>
+        <tr>
+          <td colspan="3" class="blockrow" align="left">{vb:var vbphrase.invoices_state_country}</td>
+          <td colspan="4" class="blockrow" align="left"><b>{vb:raw state}, {vb:raw country}</b></td>
+        </tr>
+        <tr>
+          <td colspan="3" class="blockrow" align="left">{vb:var vbphrase.invoices_phone}</td>
+          <td colspan="4" class="blockrow" align="left"><b>{vb:raw phone}</b></td>
+        </tr>
+        <tr>
+          <td colspan="3" class="blockrow" align="left">{vb:var vbphrase.invoices_email}</td>
+          <td colspan="4" class="blockrow" align="left">
+            <a href="mailto:{vb:raw email}"><b>{vb:raw email}</b>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3" class="blockrow" align="left">{vb:var vbphrase.invoices_vatdetails}</td>
+          <td colspan="4" class="blockrow" align="left"><b>{vb:raw vatdetails}</b></td>
+        </tr>
+        <tr>
+          <td colspan="3" class="blockrow" align="left">{vb:var vbphrase.invoices_terms}</td>
+          <td colspan="4" class="blockrow" align="left"><b>{vb:raw terms}</b></td>
+        </tr>
+        <tr>
+          <td colspan="7" class="blockhead" align="center">
+            <b>{vb:var vbphrase.invoices_customer_invoices}</b>
+          </td>
+        </tr>
+        <tr>
+          <td class="blocksubhead" align="center">{vb:var vbphrase.invoices_id}</td>
+          <td class="blocksubhead" align="center"><img border="0" src="invoices/images/invsent.png"></td>
+          <td class="blocksubhead" align="center">{vb:var vbphrase.invoices_issued}</td>
+          <td class="blocksubhead" align="center">{vb:var vbphrase.invoices_duedate}</td>
+          <td class="blocksubhead" align="center">{vb:var vbphrase.invoices_paid}</td>
+          <td class="blocksubhead" align="right">{vb:var vbphrase.invoices_net}</td>
+          <td class="blocksubhead" align="right">{vb:var vbphrase.invoices_amount}</td>
+        </tr>
+        {vb:raw customer_invoices}
+      </table>
+    </td>
+    <td align="left" valign="top" width="30%" style="padding-left:10px;">
+      <div id="sidebar_container">
+        <ul id="sidebar">
+          {vb:raw statistics}
+          {vb:raw usermenu}
+        </ul>
+      </div>
+    </td>
+  </tr>
+</table>
+</div>
+{vb:raw footer}
+</body>
+</html>
+]]></template>
+	</templates>
+	<stylevardfns>
+	</stylevardfns>
+	<stylevars>
+	</stylevars>
+	<plugins>
+		<plugin active="1" executionorder="20">
+			<title>Show Menu</title>
+			<hookname>load_show_variables</hookname>
+			<phpcode><![CDATA[
+			
+			if ($vbulletin->userinfo['permissions']['invoices'] & $vbulletin->bf_ugp['invoices']['access'])
+			{
+				$show['invoices_access'] = true;
+			} else {
+				$show['invoices_access'] = false;
+			}					
+			
+			]]></phpcode>
+		</plugin>
+		<plugin active="1" executionorder="10">
+			<title>Template Group</title>
+			<hookname>template_groups</hookname>
+			<phpcode><![CDATA[$only['invoices'] = 'invoices';]]></phpcode>
+		</plugin>
+	</plugins>
+	<phrases>
+		<phrasetype name="Permissions" fieldname="cppermission">
+			<phrase name="invoices_access" date="0" username="" version="1.0.0"><![CDATA[Can use Invoices?]]></phrase>
+			<phrase name="invoices_permissions" date="0" username="" version="1.0.0"><![CDATA[Invoices Permissions]]></phrase>
+		</phrasetype>
+		<phrasetype name="Scheduled Tasks" fieldname="cron">
+			<phrase name="invoices_cron_updated" date="0" username="" version="4.7.1"><![CDATA[A bookmarked Ad has been updated.]]></phrase>
+			<phrase name="task_cleanupitems_desc" date="0" username="" version="1.0.0"><![CDATA[Sends reminder for overdue invoices.]]></phrase>
+			<phrase name="task_cleanupitems_log" date="0" username="" version="1.0.0"><![CDATA[Invoices Reminder]]></phrase>
+			<phrase name="task_cleanupitems_title" date="0" username="" version="1.0.0"><![CDATA[Invoices Reminder]]></phrase>
+		</phrasetype>
+		<phrasetype name="Error Messages" fieldname="error">
+			<phrase name="invoices_upload_failed" date="0" username="" version="1.0.0"><![CDATA[Upload Failed.]]></phrase>
+			<phrase name="invoices_upload_wrong_size" date="0" username="" version="1.0.0"><![CDATA[Filesize is over the size limit.]]></phrase>
+			<phrase name="invoices_upload_wrong_type" date="0" username="" version="1.0.0"><![CDATA[Wrong File type.]]></phrase>
+		</phrasetype>
+		<phrasetype name="Front-End Redirect Messages" fieldname="frontredirect">
+			<phrase name="invoices_action_ok" date="0" username="" version="1.0.0"><![CDATA[Action completed successfully!]]></phrase>
+			<phrase name="invoices_active_invoices" date="0" username="" version="1.0.0"><![CDATA[Can't delete Customer as there are invoices assocciated with him.]]></phrase>
+			<phrase name="invoices_invalid_data" date="0" username="" version="1.0.0"><![CDATA[Invalid data specified]]></phrase>
+			<phrase name="invoices_settings" date="0" username="" version="1.0.0"><![CDATA[First step is to set your preferencies.]]></phrase>
+		</phrasetype>
+		<phrasetype name="GLOBAL" fieldname="global">
+			<phrase name="invoices" date="0" username="" version="1.0.0"><![CDATA[Invoices]]></phrase>
+			<phrase name="invoices_menu" date="0" username="" version="1.0.0"><![CDATA[Invoices]]></phrase>
+			<phrase name="vb_navigation_tab_tab_mzc0_453_text" date="1353741575" username="ChrisTERiS" version="4.2.0"><![CDATA[Invoices]]></phrase>
+		</phrasetype>
+		<phrasetype name="invoices" fieldname="invoices">
+			<phrase name="invoices" date="0" username="" version="1.0.0"><![CDATA[Invoices]]></phrase>
+			<phrase name="invoices_actions" date="0" username="" version="1.0.0"><![CDATA[Actions]]></phrase>
+			<phrase name="invoices_add_customer" date="0" username="" version="1.0.0"><![CDATA[Add Customer]]></phrase>
+			<phrase name="invoices_add_invoice" date="0" username="" version="1.0.0"><![CDATA[Issue Invoice]]></phrase>
+			<phrase name="invoices_addedit_customer" date="0" username="" version="1.0.0"><![CDATA[Add/Edit Customer]]></phrase>
+			<phrase name="invoices_address" date="0" username="" version="1.0.0"><![CDATA[Address]]></phrase>
+			<phrase name="invoices_amount" date="0" username="" version="1.0.0"><![CDATA[Amount]]></phrase>
+			<phrase name="invoices_balance_due" date="0" username="" version="1.0.0"><![CDATA[Balance due]]></phrase>
+			<phrase name="invoices_browse_customers" date="0" username="" version="1.0.0"><![CDATA[Browse Customers]]></phrase>
+			<phrase name="invoices_browse_invoices" date="0" username="" version="1.0.0"><![CDATA[Browse All Invoices]]></phrase>
+			<phrase name="invoices_browse_isvoid" date="0" username="" version="1.0.0"><![CDATA[Browse Void Invoices]]></phrase>
+			<phrase name="invoices_browse_overdue" date="0" username="" version="1.0.0"><![CDATA[Browse Overdue Invoices]]></phrase>
+			<phrase name="invoices_browse_paid" date="0" username="" version="1.0.0"><![CDATA[Browse Paid Invoices]]></phrase>
+			<phrase name="invoices_browse_unpaid" date="0" username="" version="1.0.0"><![CDATA[Browse Awaiting Payment Invoices]]></phrase>
+			<phrase name="invoices_chardir" date="0" username="" version="1.0.0"><![CDATA[Character direction]]></phrase>
+			<phrase name="invoices_charset" date="0" username="" version="1.0.0"><![CDATA[Character set]]></phrase>
+			<phrase name="invoices_choose_action" date="0" username="" version="1.0.0"><![CDATA[Choose an Action]]></phrase>
+			<phrase name="invoices_city" date="0" username="" version="1.0.0"><![CDATA[City]]></phrase>
+			<phrase name="invoices_company" date="0" username="" version="1.0.0"><![CDATA[Company data]]></phrase>
+			<phrase name="invoices_country" date="0" username="" version="1.0.0"><![CDATA[Country]]></phrase>
+			<phrase name="invoices_currency" date="0" username="" version="1.0.0"><![CDATA[Currency (Prefix)]]></phrase>
+			<phrase name="invoices_currency_long" date="0" username="" version="1.0.0"><![CDATA[Currency (Suffix)]]></phrase>
+			<phrase name="invoices_customer" date="0" username="" version="1.0.0"><![CDATA[Customer]]></phrase>
+			<phrase name="invoices_customer_invoices" date="0" username="" version="1.0.0"><![CDATA[Customer's Invoices]]></phrase>
+			<phrase name="invoices_customers" date="0" username="" version="1.0.0"><![CDATA[Customers]]></phrase>
+			<phrase name="invoices_dateformat" date="0" username="" version="1.0.0"><![CDATA[Date format]]></phrase>
+			<phrase name="invoices_delete" date="0" username="" version="1.0.0"><![CDATA[Delete]]></phrase>
+			<phrase name="invoices_discount" date="0" username="" version="1.0.0"><![CDATA[Discount]]></phrase>
+			<phrase name="invoices_download" date="0" username="" version="1.0.0"><![CDATA[Download]]></phrase>
+			<phrase name="invoices_duedate" date="0" username="" version="1.0.0"><![CDATA[Due date]]></phrase>
+			<phrase name="invoices_edit" date="0" username="" version="1.0.0"><![CDATA[Edit]]></phrase>
+			<phrase name="invoices_email" date="0" username="" version="1.0.0"><![CDATA[Email]]></phrase>
+			<phrase name="invoices_email_1" date="0" username="" version="1.0.0"><![CDATA[Email Invoice to Customer]]></phrase>
+			<phrase name="invoices_email_2" date="0" username="" version="1.0.0"><![CDATA[Thank you Email after Payment]]></phrase>
+			<phrase name="invoices_email_3" date="0" username="" version="1.0.0"><![CDATA[Email Reminder for Overdue Invoice]]></phrase>
+			<phrase name="invoices_email_4" date="0" username="" version="1.0.0"><![CDATA[Email asking Customer's Details]]></phrase>
+			<phrase name="invoices_email_footer" date="0" username="" version="1.0.0"><![CDATA[Footer for all outgoing Emails]]></phrase>
+			<phrase name="invoices_emailbody" date="0" username="" version="1.0.0"><![CDATA[Bodytext]]></phrase>
+			<phrase name="invoices_emailtitle" date="0" username="" version="1.0.0"><![CDATA[Subject]]></phrase>
+			<phrase name="invoices_for_customer" date="0" username="" version="1.0.0"><![CDATA[for Customer:]]></phrase>
+			<phrase name="invoices_fromemail" date="0" username="" version="1.0.0"><![CDATA[From Email (Emails]]></phrase>
+			<phrase name="invoices_fromname" date="0" username="" version="1.0.0"><![CDATA[From Name (Emails)]]></phrase>
+			<phrase name="invoices_gross" date="0" username="" version="1.0.0"><![CDATA[Gross]]></phrase>
+			<phrase name="invoices_id" date="0" username="" version="1.0.0"><![CDATA[Inv]]></phrase>
+			<phrase name="invoices_info_replace" date="0" username="" version="1.0.0"><![CDATA[You can use the following replacement variables]]></phrase>
+			<phrase name="invoices_invite_customer" date="0" username="" version="1.0.0"><![CDATA[Ask Customer's Data]]></phrase>
+			<phrase name="invoices_invoice" date="0" username="" version="1.0.0"><![CDATA[Invoice]]></phrase>
+			<phrase name="invoices_invoice_nbr" date="0" username="" version="1.0.0"><![CDATA[Invoice No]]></phrase>
+			<phrase name="invoices_invoice_phrases" date="0" username="" version="1.0.0"><![CDATA[Invoice Phrases]]></phrase>
+			<phrase name="invoices_invoice_to" date="0" username="" version="1.0.0"><![CDATA[Invoice to:]]></phrase>
+			<phrase name="invoices_issue_invoice" date="0" username="" version="1.0.0"><![CDATA[Issue Invoice]]></phrase>
+			<phrase name="invoices_issued" date="0" username="" version="1.0.0"><![CDATA[Issued]]></phrase>
+			<phrase name="invoices_issuedate" date="0" username="" version="1.0.0"><![CDATA[Issued at]]></phrase>
+			<phrase name="invoices_isvoid_invoices" date="0" username="" version="1.0.0"><![CDATA[Void Invoices]]></phrase>
+			<phrase name="invoices_item_desc" date="0" username="" version="1.0.0"><![CDATA[Item Description]]></phrase>
+			<phrase name="invoices_logo" date="0" username="" version="1.0.0"><![CDATA[Logo]]></phrase>
+			<phrase name="invoices_ltr" date="0" username="" version="1.0.0"><![CDATA[Left to Right]]></phrase>
+			<phrase name="invoices_mark_paid" date="0" username="" version="1.0.0"><![CDATA[Mark as Paid]]></phrase>
+			<phrase name="invoices_mark_unpaid" date="0" username="" version="1.0.0"><![CDATA[Cancel Payment]]></phrase>
+			<phrase name="invoices_mark_unvoid" date="0" username="" version="1.0.0"><![CDATA[Reactivate]]></phrase>
+			<phrase name="invoices_mark_void" date="0" username="" version="1.0.0"><![CDATA[Mark as Void]]></phrase>
+			<phrase name="invoices_my_statistics" date="0" username="" version="1.0.0"><![CDATA[My Statistics]]></phrase>
+			<phrase name="invoices_name" date="0" username="" version="1.0.0"><![CDATA[Name]]></phrase>
+			<phrase name="invoices_navbar" date="0" username="" version="1.0.0"><![CDATA[Invoices]]></phrase>
+			<phrase name="invoices_net" date="0" username="" version="1.0.0"><![CDATA[Net]]></phrase>
+			<phrase name="invoices_next_invoice" date="0" username="" version="1.0.0"><![CDATA[Next Invoice]]></phrase>
+			<phrase name="invoices_no" date="0" username="" version="1.0.0"><![CDATA[No]]></phrase>
+			<phrase name="invoices_overdue" date="0" username="" version="1.0.0"><![CDATA[Overdue]]></phrase>
+			<phrase name="invoices_overdue_invoices" date="0" username="" version="1.0.0"><![CDATA[Overdue Invoices]]></phrase>
+			<phrase name="invoices_paid" date="0" username="" version="1.0.0"><![CDATA[Paid]]></phrase>
+			<phrase name="invoices_paid_invoices" date="0" username="" version="1.0.0"><![CDATA[Paid Invoices]]></phrase>
+			<phrase name="invoices_paypal" date="0" username="" version="1.0.0"><![CDATA[Accept PayPal?]]></phrase>
+			<phrase name="invoices_paypal_email" date="0" username="" version="1.0.0"><![CDATA[PayPal Email]]></phrase>
+			<phrase name="invoices_perpage" date="0" username="" version="1.0.0"><![CDATA[Records per page]]></phrase>
+			<phrase name="invoices_phone" date="0" username="" version="1.0.0"><![CDATA[Phone]]></phrase>
+			<phrase name="invoices_preview" date="0" username="" version="1.0.0"><![CDATA[Preview]]></phrase>
+			<phrase name="invoices_price" date="0" username="" version="1.0.0"><![CDATA[Price]]></phrase>
+			<phrase name="invoices_priceformat" date="0" username="" version="1.0.0"><![CDATA[Price format]]></phrase>
+			<phrase name="invoices_qty" date="0" username="" version="1.0.0"><![CDATA[Qty]]></phrase>
+			<phrase name="invoices_remove" date="0" username="" version="1.0.0"><![CDATA[Remove]]></phrase>
+			<phrase name="invoices_replace_amount" date="0" username="" version="1.0.0"><![CDATA[@amount for Balance due amount]]></phrase>
+			<phrase name="invoices_replace_customer" date="0" username="" version="1.0.0"><![CDATA[@customer for Customer's name]]></phrase>
+			<phrase name="invoices_replace_invoice" date="0" username="" version="1.0.0"><![CDATA[@invoice for Invoice number]]></phrase>
+			<phrase name="invoices_rtl" date="0" username="" version="1.0.0"><![CDATA[Right to Left]]></phrase>
+			<phrase name="invoices_select" date="0" username="" version="1.0.0"><![CDATA[Select...]]></phrase>
+			<phrase name="invoices_send_invoice" date="0" username="" version="1.0.0"><![CDATA[Send Invoice]]></phrase>
+			<phrase name="invoices_send_overdue" date="0" username="" version="1.0.0"><![CDATA[Send Overdue]]></phrase>
+			<phrase name="invoices_settings" date="0" username="" version="1.0.0"><![CDATA[Settings]]></phrase>
+			<phrase name="invoices_shipping" date="0" username="" version="1.0.0"><![CDATA[Shipping]]></phrase>
+			<phrase name="invoices_state" date="0" username="" version="1.0.0"><![CDATA[State]]></phrase>
+			<phrase name="invoices_state_country" date="0" username="" version="1.0.0"><![CDATA[State, Country]]></phrase>
+			<phrase name="invoices_submit" date="0" username="" version="1.0.0"><![CDATA[ Submit ]]></phrase>
+			<phrase name="invoices_subtotal" date="0" username="" version="1.0.0"><![CDATA[Net Subtotal]]></phrase>
+			<phrase name="invoices_tax" date="0" username="" version="1.0.0"><![CDATA[Tax]]></phrase>
+			<phrase name="invoices_tax_amount" date="0" username="" version="1.0.0"><![CDATA[Tax Amount]]></phrase>
+			<phrase name="invoices_tax_sum" date="0" username="" version="1.0.0"><![CDATA[Tax Sum]]></phrase>
+			<phrase name="invoices_templates" date="0" username="" version="1.0.0"><![CDATA[Email Templates]]></phrase>
+			<phrase name="invoices_terms" date="0" username="" version="1.0.0"><![CDATA[Payment Terms]]></phrase>
+			<phrase name="invoices_terms_notes" date="0" username="" version="1.0.0"><![CDATA[Terms / Notes]]></phrase>
+			<phrase name="invoices_total" date="0" username="" version="1.0.0"><![CDATA[Total Net]]></phrase>
+			<phrase name="invoices_total_invoices" date="0" username="" version="1.0.0"><![CDATA[Total Invoices]]></phrase>
+			<phrase name="invoices_unpaid" date="0" username="" version="1.0.0"><![CDATA[Unpaid]]></phrase>
+			<phrase name="invoices_unpaid_invoices" date="0" username="" version="1.0.0"><![CDATA[Awaiting Payment]]></phrase>
+			<phrase name="invoices_vat" date="0" username="" version="1.0.0"><![CDATA[VAT (eg 17.50)]]></phrase>
+			<phrase name="invoices_vatdetails" date="0" username="" version="1.0.0"><![CDATA[VAT Details]]></phrase>
+			<phrase name="invoices_yes" date="0" username="" version="1.0.0"><![CDATA[Yes]]></phrase>
+			<phrase name="invoices_zipcode" date="0" username="" version="1.0.0"><![CDATA[Zipcode]]></phrase>
+			<phrase name="invoices_zipcode_city" date="0" username="" version="1.0.0"><![CDATA[Zipcode, City]]></phrase>
+		</phrasetype>
+	</phrases>
+	<options>
+	</options>
+	<helptopics>
+	</helptopics>
+	<cronentries>
+		<cron varname="cleanupitems" active="1" loglevel="0">
+			<filename>includes/cron/invoices.php</filename>
+			<scheduling weekday="-1" day="-1" hour="23" minute="0,10,20,30,40,50" />
+		</cron>
+	</cronentries>
+	<faqentries>
+	</faqentries>
+	<navigation>
+		<tab name="tab_mzc0_453" date="1369783238" username="Lionel" version="1.0.0">
+			<active>1</active>
+			<show>invoices_access</show>
+			<scripts>invoices</scripts>
+			<displayorder>120</displayorder>
+			<url>invoices.php</url>
+			<menuid />
+		</tab>
+	</navigation>
+</product>
